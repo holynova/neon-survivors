@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const url = process.argv[2] ?? 'http://127.0.0.1:4173';
-const out = path.resolve(process.argv[3] ?? 'docs/screenshot.png');
+const out = path.resolve(process.argv[3] ?? 'docs/screenshot.jpg');
 fs.mkdirSync(path.dirname(out), { recursive: true });
 
 const browser = await chromium.launch({
@@ -21,7 +21,7 @@ const browser = await chromium.launch({
     '--ignore-gpu-blocklist',
   ],
 });
-const page = await browser.newPage({ viewport: { width: 1440, height: 810 }, deviceScaleFactor: 2 });
+const page = await browser.newPage({ viewport: { width: 1440, height: 810 }, deviceScaleFactor: 1 });
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.waitForFunction(() => window.__NS__?.game, null, { timeout: 20000 });
 
@@ -111,6 +111,6 @@ if (scene.state !== 'playing' || scene.enemies < 3) {
   process.exit(1);
 }
 
-await page.screenshot({ path: out });
+await page.screenshot({ path: out, type: 'jpeg', quality: 82 });
 console.log('saved', out);
 await browser.close();

@@ -2,7 +2,7 @@
 
 浏览器里的 **3D 俯视角类幸存者 Roguelite**。武器自动开火，你只需走位与成长。
 
-![gameplay](docs/screenshot.png)
+![gameplay](docs/screenshot.jpg)
 
 **在线试玩** → <https://holynova.github.io/neon-survivors/>　手机扫码 👉
 
