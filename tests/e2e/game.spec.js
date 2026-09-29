@@ -396,15 +396,19 @@ test.describe('characters and weapons', () => {
         g.player.addWeapon(wid);
         g.player.weapons[0].level = 4;
         g.player.iframe = 9999;
+        // Wait for damage rather than a fixed duration. A flat window has to be
+        // long enough for the slowest weapon (grenade, 1.5s cooldown) plus its
+        // arc travel, which made this test fail roughly one run in three.
         const t0 = performance.now();
-        while (performance.now() - t0 < 2500) {
+        while (performance.now() - t0 < 9000) {
           await new Promise((r) => requestAnimationFrame(r));
           if (g.state === 'levelup') g.chooseCard(0);
+          if (g.player.damageDealt > 0) break;
         }
         return Math.round(g.player.damageDealt);
       }, w);
 
-      expect(dealt, `${w} dealt no damage in 2.5s`).toBeGreaterThan(0);
+      expect(dealt, `${w} dealt no damage within 9s`).toBeGreaterThan(0);
       await expectNoErrors(errors, `weapon ${w}`);
     }
   });

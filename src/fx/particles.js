@@ -488,8 +488,13 @@ export class FX {
     this.shockRing(x, z, 4, [1, 1, 1], 0.6);
   }
 
-  frost(x, y, z, color) {
-    for (let i = 0; i < 6; i++) {
+  /**
+   * Frost motes. `count` is a budget knob: high-rate weapons must pass a small
+   * number, because these land in the additive `glow` system and overlapping
+   * sprites saturate to a flat white blob that hides the player.
+   */
+  frost(x, y, z, color, count = 6) {
+    for (let i = 0; i < count; i++) {
       const a = Math.random() * Math.PI * 2;
       this.glow.emit({
         x, y: y + Math.random() * 0.8, z,
@@ -497,8 +502,8 @@ export class FX {
         vy: -0.6 - Math.random() * 1.2,
         vz: Math.sin(a) * (1 + Math.random() * 2),
         color,
-        size: 0.22 + Math.random() * 0.28,
-        life: 0.45 + Math.random() * 0.4,
+        size: 0.18 + Math.random() * 0.2,
+        life: 0.34 + Math.random() * 0.26,
         drag: 2,
         spin: Math.random() * 6,
         spinV: (Math.random() - 0.5) * 4,

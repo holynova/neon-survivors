@@ -254,3 +254,65 @@ test('harder difficulty produces bigger waves', () => {
   const hard = wavePlan(8, DIFFICULTIES.hard);
   assert.ok(hard.budget > easy.budget);
 });
+
+// ------------------------------------------------------------ fx budgets
+
+/**
+ * Additive particle sprites saturate to a flat white blob when enough of them
+ * overlap. The Frost Lance originally emitted 3 puffs x 6 motes = 18 additive
+ * particles per shot at 12 shots/s (~216/sec), which blew out the middle of the
+ * screen and hid the player — it read as the weapon "firing infinitely".
+ *
+ * The per-shot budget now lives in the weapon definition, so this test can hold
+ * the line without a browser. See fxConeBudget() below.
+ */
+function fxConeBudget(weapon, level = 1) {
+  const s = weaponStats(weapon, level);
+  const shotsPerSec = s.cd ? 1 / s.cd : 0;
+  const fx = s.fx;
+  if (!fx) return { shotsPerSec, perShot: 0, perSec: 0, decalsPerSec: 0 };
+  return {
+    shotsPerSec,
+    perShot: fx.puffs * fx.motes,
+    perSec: fx.puffs * fx.motes * shotsPerSec,
+    decalsPerSec: fx.puffs * fx.decal * shotsPerSec,
+  };
+}
+
+test('the frost lance declares an explicit per-shot fx budget', () => {
+  const frost = WEAPON_BY_ID.frost;
+  const fx = frost.base.fx;
+  assert.ok(fx, 'frost must declare an fx budget');
+  assert.ok(fx.puffs >= 1 && fx.puffs <= 6, `puffs out of range: ${fx.puffs}`);
+  assert.ok(fx.motes >= 1 && fx.motes <= 3, `motes out of range: ${fx.motes}`);
+  for (const k of ['trail', 'decal']) {
+    assert.ok(fx[k] >= 0 && fx[k] <= 1, `${k} must be a probability: ${fx[k]}`);
+  }
+});
+
+test('no weapon emits an unbounded stream of additive particles', () => {
+  // ~60 additive sprites/sec is already a dense but readable effect. The old
+  // frost budget was ~216/sec; anything past this reads as a screen-wide flash.
+  const BUDGET_PER_SEC = 60;
+  for (const w of WEAPONS) {
+    const b = fxConeBudget(w, 4);
+    assert.ok(
+      b.perSec <= BUDGET_PER_SEC,
+      `${w.id} emits ~${b.perSec.toFixed(0)} additive particles/sec (budget ${BUDGET_PER_SEC})`,
+    );
+    assert.ok(
+      b.decalsPerSec <= 8,
+      `${w.id} spawns ~${b.decalsPerSec.toFixed(1)} ground decals/sec`,
+    );
+  }
+});
+
+test('the frost budget stays within limits at every level', () => {
+  const frost = WEAPON_BY_ID.frost;
+  for (let lvl = 1; lvl <= frost.maxLevel; lvl++) {
+    const b = fxConeBudget(frost, lvl);
+    assert.ok(b.perSec <= 60, `level ${lvl} emits ~${b.perSec.toFixed(0)}/sec`);
+    // The budget must not scale with level — only damage/range should.
+    assert.equal(b.perShot, fxConeBudget(frost, 1).perShot, `level ${lvl} changed the particle count`);
+  }
+});

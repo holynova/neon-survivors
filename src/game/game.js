@@ -1004,20 +1004,23 @@ export class Game {
     const dmg = s.damage * p.stats.get('damage');
     const hits = new Map();
 
-    for (let i = 0; i < 3; i++) {
+    // Frost Lance is a 12 shots/s weapon, so the per-shot effect budget is
+    // declared in weaponDefs and read here. Ground patches scatter along the
+    // cone rather than stacking on one spot ahead of the muzzle, which used to
+    // read as a single solid disc.
+    const fxb = s.fx;
+    for (let i = 0; i < fxb.puffs; i++) {
       const a = baseAngle + (Math.random() - 0.5) * s.cone * 2;
-      const d = Math.random() * s.range;
+      const d = s.range * (0.25 + Math.random() * 0.75);
       const x = m.x + Math.cos(a) * d;
       const z = m.z + Math.sin(a) * d;
-      this.fx.emitFrostPuff?.(x, 0.9, z);
-      this.fx.frost(x, 0.5 + Math.random() * 0.9, z, [0.45, 0.88, 1]);
-      if (Math.random() < 0.35) {
-        this.fx.trailPuff(x, 0.8, z, [0.55, 0.9, 1], 0.4, 0.3);
+      this.fx.frost(x, 0.5 + Math.random() * 0.9, z, [0.3, 0.62, 0.8], fxb.motes);
+      if (Math.random() < fxb.trail) {
+        this.fx.trailPuff(x, 0.8, z, [0.4, 0.68, 0.85], 0.34, 0.26);
       }
-    }
-    // short-lived ground frost near the player
-    if (this.effectsOn && Math.random() < 0.5) {
-      this.decal.spawn({ x: m.x + aim.x * 2.5, z: m.z + aim.z * 2.5, r: 2.4, dur: 1.6, color: [0.15, 0.4, 0.75] });
+      if (this.effectsOn && Math.random() < fxb.decal) {
+        this.decal.spawn({ x, z, r: 1.1 + Math.random() * 0.7, dur: 1.3, color: [0.12, 0.34, 0.62] });
+      }
     }
 
     for (const e of this.enemies.list) {

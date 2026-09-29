@@ -77,7 +77,16 @@ export const WEAPONS = [
     tier: 2,
     sound: 'frost',
     maxLevel: 4,
-    base: { damage: 3.2, cd: 0.075, dps: true, cone: 0.42, range: 9, slow: 0.4, slowDur: 1.6, spread: 0.5 },
+    base: {
+      damage: 3.2, cd: 0.075, dps: true, cone: 0.42, range: 9,
+      slow: 0.4, slowDur: 1.6, spread: 0.5,
+      // Per-shot effect budget. This weapon fires 12x/s, so the emitter has to
+      // stay frugal: motes are additive sprites, and a cone-wide cloud of them
+      // saturates to a white blob that hides the player. `motes * puffs` is the
+      // per-shot particle count — keep it low, and see the budget test in
+      // tests/unit/content.test.js before raising it.
+      fx: { puffs: 3, motes: 1, trail: 0.35, decal: 0.16 },
+    },
     levels: [{ cone: 0.5, range: 10 }, { damage: 4.4, slow: 0.5 }, { damage: 5.6, cone: 0.58, range: 11.5 }],
     evolve: { id: 'frost_evolved', name: '绝对零域', recipes: { frost_core: 1 } },
   },
