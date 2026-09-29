@@ -1,0 +1,25 @@
+{
+  "name": "neon-survivors",
+  "version": "1.0.0",
+  "description": "3D survivors-like roguelite (Brotato-inspired) built with Three.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test \"tests/unit/**/*.test.js\"",
+    "test:e2e": "playwright test",
+    "shot": "node scripts/shot.mjs",
+    "start": "vite --port 5180 --strictPort",
+    "serve": ".tmp/serve.sh"
+  },
+  "type": "module",
+  "dependencies": {
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "vite": "^8.3.1"
+  },
+  "private": true
+}

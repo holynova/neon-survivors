@@ -1,0 +1,7 @@
+node_modules/
+dist/
+shots/
+.tmp/
+tests/.artifacts/
+.DS_Store
+*.log
