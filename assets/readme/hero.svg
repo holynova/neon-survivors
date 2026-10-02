@@ -1,0 +1,312 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440" role="img" aria-labelledby="title desc">
+  <title id="title">NEON SURVIVORS — 霓虹幸存者</title>
+  <desc id="desc">Zero-Asset Procedural 3D Survivor Roguelite arena in Three.js and Vite</desc>
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#060814" />
+      <stop offset="50%" stop-color="#0a0d20" />
+      <stop offset="100%" stop-color="#050711" />
+    </linearGradient>
+    <linearGradient id="title-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f3ff" />
+      <stop offset="50%" stop-color="#70a6ff" />
+      <stop offset="100%" stop-color="#d946ef" />
+    </linearGradient>
+    <linearGradient id="beam-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff3b5c" stop-opacity="0" />
+      <stop offset="20%" stop-color="#ff3b5c" stop-opacity="0.9" />
+      <stop offset="80%" stop-color="#ffffff" stop-opacity="1" />
+      <stop offset="100%" stop-color="#ff7b92" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="frost-grad" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#00f3ff" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#00f3ff" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="hp-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f3ff" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <linearGradient id="card-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f3ff" stop-opacity="0.6" />
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#00f3ff" stop-opacity="0.1" />
+    </linearGradient>
+    <radialGradient id="arena-glow" cx="68%" cy="52%" r="48%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25" />
+      <stop offset="45%" stop-color="#8b5cf6" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#060814" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="player-core-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+      <stop offset="35%" stop-color="#00f3ff" stop-opacity="0.9" />
+      <stop offset="70%" stop-color="#00f3ff" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#00f3ff" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="boss-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff3b5c" stop-opacity="0.8" />
+      <stop offset="60%" stop-color="#ff5a2b" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#ff5a2b" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Arena Perspective Grid Pattern -->
+    <pattern id="cyber-grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M 36 0 L 0 0 0 36" fill="none" stroke="#1e294b" stroke-width="0.8" stroke-opacity="0.45" />
+    </pattern>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="440" rx="16" fill="url(#bg-grad)" />
+  <rect width="1200" height="440" rx="16" fill="url(#arena-glow)" />
+
+  <!-- Outer Cyber Frame -->
+  <rect x="12" y="12" width="1176" height="416" rx="12" fill="none" stroke="url(#card-border)" stroke-width="1.2" />
+
+  <!-- Arena 3D Isometric Ground Grid (Right Side) -->
+  <g transform="translate(480, 20)">
+    <!-- Skewed Perspective Grid Plane -->
+    <g transform="matrix(1 0 -0.5 0.52 140 30)" opacity="0.65">
+      <rect x="0" y="0" width="580" height="520" fill="url(#cyber-grid)" />
+      <!-- Concentric Arena Rings -->
+      <circle cx="280" cy="260" r="80" fill="none" stroke="#00f3ff" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.6" />
+      <circle cx="280" cy="260" r="150" fill="none" stroke="#3b82f6" stroke-width="1.2" stroke-opacity="0.4" />
+      <circle cx="280" cy="260" r="230" fill="none" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="12 8" stroke-opacity="0.3" />
+      <circle cx="280" cy="260" r="300" fill="none" stroke="#ff3b5c" stroke-width="1.5" stroke-opacity="0.25" />
+    </g>
+  </g>
+
+  <!-- Battle Scene Projection (Right Side x: 580..1160, y: 40..400) -->
+  <g id="arena-battlefield">
+    <!-- Shockwave Rings from Player -->
+    <ellipse cx="860" cy="225" rx="130" ry="62" fill="none" stroke="#00f3ff" stroke-width="1.5" stroke-opacity="0.5" />
+    <ellipse cx="860" cy="225" rx="190" ry="92" fill="none" stroke="#38bdf8" stroke-width="1" stroke-dasharray="6 6" stroke-opacity="0.3" />
+    <ellipse cx="860" cy="225" rx="260" ry="124" fill="none" stroke="#818cf8" stroke-width="0.8" stroke-opacity="0.2" />
+
+    <!-- Weapon 1: Railgun Piercing Beam (Red/White line piercing through tanks) -->
+    <line x1="860" y1="225" x2="1140" y2="130" stroke="url(#beam-grad)" stroke-width="7" stroke-linecap="round" />
+    <line x1="860" y1="225" x2="1140" y2="130" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.9" />
+
+    <!-- Weapon 2: Frost Lance Cone (Cyan Arc) -->
+    <path d="M 860 225 L 720 130 A 130 130 0 0 1 760 100 Z" fill="url(#frost-grad)" />
+    <!-- Frost Motes -->
+    <circle cx="760" cy="130" r="2.5" fill="#e0f2fe" opacity="0.8" />
+    <circle cx="735" cy="145" r="2" fill="#7dd3fc" opacity="0.7" />
+    <circle cx="780" cy="115" r="3" fill="#bae6fd" opacity="0.9" />
+
+    <!-- Weapon 3: Tesla Lightning Arcs (Purple jagged path jumping) -->
+    <path d="M 860 225 L 890 280 L 930 270 L 975 320 L 1020 300 L 1060 345" fill="none" stroke="#c084fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 860 225 L 890 280 L 930 270 L 975 320 L 1020 300 L 1060 345" fill="none" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" />
+
+    <!-- Weapon 4: Scatter Shotgun Cone (Amber bullets) -->
+    <g fill="#f59e0b" opacity="0.9">
+      <circle cx="950" cy="195" r="3.5" />
+      <circle cx="965" cy="210" r="3.2" />
+      <circle cx="975" cy="180" r="3" />
+      <circle cx="990" cy="225" r="3.5" />
+      <circle cx="1005" cy="198" r="3" />
+      <line x1="860" y1="225" x2="950" y2="195" stroke="#fbbf24" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 3" />
+      <line x1="860" y1="225" x2="965" y2="210" stroke="#fbbf24" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 3" />
+      <line x1="860" y1="225" x2="975" y2="180" stroke="#fbbf24" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 3" />
+    </g>
+
+    <!-- Weapon 5: Swarm Missiles (Curved homing trails) -->
+    <path d="M 860 225 Q 850 310 895 340 T 960 365" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="5 3" />
+    <circle cx="960" cy="365" r="3.5" fill="#fef08a" />
+    <path d="M 860 225 Q 910 140 965 140 T 1030 110" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="5 3" />
+    <circle cx="1030" cy="110" r="3.5" fill="#fef08a" />
+
+    <!-- Weapon 6: Orbital Guard Blades (Green circling) -->
+    <ellipse cx="860" cy="225" rx="55" ry="26" fill="none" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.7" />
+    <g transform="translate(810, 218)">
+      <polygon points="0,0 12,-4 16,0 12,4" fill="#34d399" stroke="#10b981" stroke-width="1" />
+    </g>
+    <g transform="translate(910, 232)">
+      <polygon points="0,0 -12,-4 -16,0 -12,4" fill="#34d399" stroke="#10b981" stroke-width="1" />
+    </g>
+
+    <!-- Player Ship / Avatar (Center: 860, 225) -->
+    <ellipse cx="860" cy="225" rx="36" ry="18" fill="url(#player-core-glow)" />
+    <!-- Player Wireframe / Silhouette -->
+    <polygon points="860,205 874,228 860,224 846,228" fill="#0284c7" stroke="#00f3ff" stroke-width="2" />
+    <circle cx="860" cy="221" r="4" fill="#ffffff" />
+    <circle cx="860" cy="221" r="7" fill="none" stroke="#00f3ff" stroke-width="1" />
+
+    <!-- Enemies (Wireframe Geometric Silhouettes) -->
+    <!-- Enemy 1: Grunts (Tetrahedrons - Red) -->
+    <g transform="translate(740, 140)">
+      <polygon points="0,-10 9,6 -9,6" fill="#1f1124" stroke="#ff4d6d" stroke-width="1.5" />
+      <line x1="0" y1="-10" x2="0" y2="6" stroke="#ff4d6d" stroke-width="1" opacity="0.6" />
+    </g>
+    <g transform="translate(710, 165)">
+      <polygon points="0,-9 8,5 -8,5" fill="#1f1124" stroke="#ff4d6d" stroke-width="1.5" />
+    </g>
+    <g transform="translate(760, 175)">
+      <polygon points="0,-8 7,5 -7,5" fill="#1f1124" stroke="#ff4d6d" stroke-width="1.5" />
+    </g>
+
+    <!-- Enemy 2: Runners (Octahedrons - Orange) -->
+    <g transform="translate(890, 275)">
+      <polygon points="0,-12 10,0 0,12 -10,0" fill="#241710" stroke="#ff9f43" stroke-width="1.5" />
+      <line x1="-10" y1="0" x2="10" y2="0" stroke="#ff9f43" stroke-width="1" opacity="0.5" />
+      <line x1="0" y1="-12" x2="0" y2="12" stroke="#ff9f43" stroke-width="1" opacity="0.5" />
+    </g>
+
+    <!-- Enemy 3: Tanks (Heavy Cube - Blue) -->
+    <g transform="translate(1015, 295)">
+      <polygon points="-16,-10 0,-18 16,-10 16,8 0,16 -16,8" fill="#0f1d3a" stroke="#6c8cff" stroke-width="2" />
+      <line x1="0" y1="-18" x2="0" y2="16" stroke="#6c8cff" stroke-width="1" />
+      <line x1="-16" y1="-10" x2="0" y2="-2" stroke="#6c8cff" stroke-width="1" />
+      <line x1="16" y1="-10" x2="0" y2="-2" stroke="#6c8cff" stroke-width="1" />
+      <!-- HP bar above tank -->
+      <rect x="-14" y="-25" width="28" height="3" fill="#1e293b" rx="1.5" />
+      <rect x="-14" y="-25" width="16" height="3" fill="#6c8cff" rx="1.5" />
+    </g>
+
+    <!-- Enemy 4: Boss - Colossus Core (Wave 5 / Wave 20 Giant) -->
+    <g transform="translate(1080, 115)">
+      <!-- Boss Glow Field -->
+      <circle cx="0" cy="0" r="54" fill="url(#boss-glow)" />
+      <!-- Boss Outer Armor Ring -->
+      <circle cx="0" cy="0" r="36" fill="none" stroke="#ff5a2b" stroke-width="2" stroke-dasharray="14 6" />
+      <!-- Core Body -->
+      <polygon points="0,-26 24,-10 24,18 0,28 -24,18 -24,-10" fill="#310d18" stroke="#ff3b5c" stroke-width="2.5" />
+      <circle cx="0" cy="0" r="10" fill="#ff5a2b" />
+      <circle cx="0" cy="0" r="4" fill="#ffffff" />
+      <!-- Boss Radial Bullet Ring (Telegraphed bullets) -->
+      <circle cx="-38" cy="-18" r="3" fill="#ff5a2b" />
+      <circle cx="-42" cy="8" r="3" fill="#ff5a2b" />
+      <circle cx="-34" cy="32" r="3" fill="#ff5a2b" />
+      <circle cx="-12" cy="44" r="3" fill="#ff5a2b" />
+      <circle cx="16" cy="42" r="3" fill="#ff5a2b" />
+      <!-- Boss Tag -->
+      <rect x="-38" y="-44" width="76" height="15" rx="3" fill="#18040a" stroke="#ff3b5c" stroke-width="1" />
+      <text x="0" y="-33" fill="#ff859c" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="1">BOSS · 熔核巨像</text>
+    </g>
+
+    <!-- Damage Float Numbers -->
+    <text x="965" y="165" fill="#ffd166" font-family="ui-monospace, monospace" font-size="13" font-weight="800">138 CRIT!</text>
+    <text x="1035" y="275" fill="#60a5fa" font-family="ui-monospace, monospace" font-size="11" font-weight="700">58</text>
+    <text x="745" y="125" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="10" font-weight="600">FREEZE</text>
+    <text x="1040" y="335" fill="#c084fc" font-family="ui-monospace, monospace" font-size="11" font-weight="700">SHOCK -26</text>
+
+    <!-- In-Game Minimap Radar (Top Right) -->
+    <g transform="translate(1085, 340)">
+      <rect x="-45" y="-45" width="90" height="75" rx="8" fill="#080c1e" fill-opacity="0.85" stroke="#1e294b" stroke-width="1.2" />
+      <circle cx="0" cy="-6" r="32" fill="none" stroke="#00f3ff" stroke-width="0.7" stroke-opacity="0.3" />
+      <circle cx="0" cy="-6" r="18" fill="none" stroke="#00f3ff" stroke-width="0.7" stroke-opacity="0.2" />
+      <line x1="-32" y1="-6" x2="32" y2="-6" stroke="#00f3ff" stroke-width="0.5" stroke-opacity="0.25" />
+      <line x1="0" y1="-38" x2="0" y2="26" stroke="#00f3ff" stroke-width="0.5" stroke-opacity="0.25" />
+      <!-- Radar pings -->
+      <circle cx="0" cy="-6" r="2.5" fill="#00f3ff" />
+      <circle cx="16" cy="-18" r="3" fill="#ff3b5c" />
+      <circle cx="-12" cy="10" r="1.8" fill="#ff4d6d" />
+      <circle cx="10" cy="14" r="2" fill="#6c8cff" />
+      <text x="0" y="24" fill="#64748b" font-family="ui-monospace, monospace" font-size="7.5" text-anchor="middle">RADAR · 360°</text>
+    </g>
+  </g>
+
+  <!-- Left Content Block (Branding & Key Value Proposition) -->
+  <g id="title-block" transform="translate(56, 44)">
+    <!-- Eyebrow Badges -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="138" height="24" rx="6" fill="#0c1938" stroke="#0284c7" stroke-width="1" />
+      <circle cx="12" cy="12" r="4" fill="#00f3ff" />
+      <text x="24" y="16" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" letter-spacing="0.5">THREE.JS 0.186</text>
+
+      <rect x="146" y="0" width="146" height="24" rx="6" fill="#201034" stroke="#9333ea" stroke-width="1" />
+      <circle cx="158" cy="12" r="4" fill="#c084fc" />
+      <text x="170" y="16" fill="#e879f9" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" letter-spacing="0.5">ZERO ASSETS · 0 KB</text>
+
+      <rect x="300" y="0" width="124" height="24" rx="6" fill="#0f291e" stroke="#059669" stroke-width="1" />
+      <circle cx="312" cy="12" r="4" fill="#34d399" />
+      <text x="324" y="16" fill="#6ee7b7" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" letter-spacing="0.5">60 FPS ROGUELITE</text>
+    </g>
+
+    <!-- Main Title -->
+    <g transform="translate(0, 54)">
+      <text x="0" y="44" fill="url(#title-grad)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', sans-serif" font-size="44" font-weight="900" letter-spacing="2">NEON SURVIVORS</text>
+      <text x="0" y="78" fill="#e2e8f0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', sans-serif" font-size="21" font-weight="600" letter-spacing="0.5">
+        霓虹幸存者 <tspan fill="#64748b" font-weight="400">|</tspan> <tspan fill="#38bdf8" font-size="18">纯算力程序化 3D 俯视角弹幕肉鸽</tspan>
+      </text>
+    </g>
+
+    <!-- Punchy Description -->
+    <g transform="translate(0, 160)">
+      <text x="0" y="0" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', sans-serif" font-size="14.5" font-weight="400">
+        无外挂模型、无贴图与音频切片。纯 Three.js 程序化几何体 + Fresnel 轮廓 Shader，
+      </text>
+      <text x="0" y="24" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', sans-serif" font-size="14.5" font-weight="400">
+        融合 WebAudio 实时波形合成。自动开火、走位破局、武器超武进化与波间战术商店。
+      </text>
+    </g>
+
+    <!-- In-Game HUD Telemetry Box -->
+    <g transform="translate(0, 212)">
+      <!-- HUD Background Container -->
+      <rect x="0" y="0" width="460" height="88" rx="10" fill="#070c1d" fill-opacity="0.9" stroke="#1e294b" stroke-width="1.2" />
+
+      <!-- HP & Energy Meters -->
+      <g transform="translate(18, 16)">
+        <text x="0" y="10" fill="#64748b" font-family="ui-monospace, monospace" font-size="10" font-weight="700">HP VITALITY</text>
+        <rect x="75" y="0" width="130" height="12" rx="3" fill="#0f172a" />
+        <rect x="75" y="0" width="108" height="12" rx="3" fill="url(#hp-grad)" />
+        <text x="212" y="10" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700">324/380</text>
+
+        <text x="0" y="30" fill="#64748b" font-family="ui-monospace, monospace" font-size="10" font-weight="700">OVERLOAD</text>
+        <rect x="75" y="20" width="130" height="12" rx="3" fill="#0f172a" />
+        <rect x="75" y="20" width="130" height="12" rx="3" fill="#a855f7" />
+        <text x="212" y="30" fill="#c084fc" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700">READY (E)</text>
+      </g>
+
+      <!-- Wave & Boss Indicator -->
+      <g transform="translate(300, 16)">
+        <rect x="0" y="0" width="142" height="52" rx="6" fill="#140718" stroke="#ff3b5c" stroke-width="1" stroke-opacity="0.8" />
+        <text x="71" y="18" fill="#ff3b5c" font-family="ui-monospace, monospace" font-size="10" font-weight="800" text-anchor="middle" letter-spacing="1">WAVE 20 / 20</text>
+        <text x="71" y="36" fill="#fda4af" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="700" text-anchor="middle">FINAL BOSS</text>
+      </g>
+
+      <!-- Equipped Weapon Pills / Arsenal Preview -->
+      <g transform="translate(18, 58)">
+        <text x="0" y="16" fill="#64748b" font-family="ui-monospace, monospace" font-size="10" font-weight="700">LOADOUT:</text>
+        <!-- Weapon 1: Scatter (Lv.4 Max) -->
+        <rect x="66" y="4" width="58" height="18" rx="4" fill="#27190b" stroke="#f59e0b" stroke-width="1" />
+        <text x="95" y="16" fill="#fbbf24" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" text-anchor="middle">霰弹 Lv4</text>
+        <!-- Weapon 2: Tesla (Evolved) -->
+        <rect x="130" y="4" width="62" height="18" rx="4" fill="#240e34" stroke="#a855f7" stroke-width="1" />
+        <text x="161" y="16" fill="#d8b4fe" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" text-anchor="middle">风暴电网★</text>
+        <!-- Weapon 3: Railgun -->
+        <rect x="198" y="4" width="58" height="18" rx="4" fill="#2d0b16" stroke="#ff3b5c" stroke-width="1" />
+        <text x="227" y="16" fill="#fda4af" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" text-anchor="middle">重炮 Lv3</text>
+        <!-- Weapon 4: Frost -->
+        <rect x="262" y="4" width="58" height="18" rx="4" fill="#082333" stroke="#00f3ff" stroke-width="1" />
+        <text x="291" y="16" fill="#7dd3fc" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" text-anchor="middle">霜冻 Lv3</text>
+        <!-- Weapon 5: Orbital -->
+        <rect x="326" y="4" width="58" height="18" rx="4" fill="#09271c" stroke="#10b981" stroke-width="1" />
+        <text x="355" y="16" fill="#6ee7b7" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" text-anchor="middle">护卫 Lv4</text>
+        <!-- Weapon 6: Swarm -->
+        <rect x="390" y="4" width="58" height="18" rx="4" fill="#2d2105" stroke="#eab308" stroke-width="1" />
+        <text x="419" y="16" fill="#fde047" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="700" text-anchor="middle">蜂群 Lv2</text>
+      </g>
+    </g>
+
+    <!-- Footer Meta Features Row -->
+    <g transform="translate(0, 318)">
+      <g transform="translate(0, 0)">
+        <text x="0" y="16" fill="#00f3ff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700">5 名特化角色</text>
+        <text x="0" y="34" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5">改写掉落/召唤/减速等规则</text>
+      </g>
+      <g transform="translate(118, 0)">
+        <text x="0" y="16" fill="#a855f7" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700">8 武器超武合成</text>
+        <text x="0" y="34" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5">满级 + 核心材料质变进化</text>
+      </g>
+      <g transform="translate(244, 0)">
+        <text x="0" y="16" fill="#ff3b5c" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700">8 机兵 + 3 巨型 Boss</text>
+        <text x="0" y="34" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5">独立剪影、扫掠碰撞防穿透</text>
+      </g>
+      <g transform="translate(390, 0)">
+        <text x="0" y="16" fill="#10b981" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700">113 单测 + 17 E2E</text>
+        <text x="0" y="34" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5">无头数值平衡与 pageerror 守卫</text>
+      </g>
+    </g>
+  </g>
+</svg>
