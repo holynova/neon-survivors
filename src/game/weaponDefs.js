@@ -23,13 +23,13 @@ export const WEAPONS = [
       { pellets: 8, damage: 19, spread: 0.5 },
       { pellets: 9, damage: 25, cd: 0.78, knock: 5 },
     ],
-    evolve: { id: 'scatter_evolved', name: '爆裂霰弹枪' },
+    evolve: { id: 'scatter_evolved', name: '爆裂霰弹枪', recipes: { magnetic_core: 1 } },
   },
   {
     id: 'smg',
     name: '脉冲机枪',
     nameEn: 'Pulse SMG',
-    desc: '高射速单体弹，射速随机抖动；连续射击逐步提速',
+    desc: '高射速单体弹，射速随机抖动；连续射击伤害逐步提升',
     color: '#41b8ff',
     element: 'kinetic',
     tier: 1,
@@ -122,7 +122,7 @@ export const WEAPONS = [
     id: 'swarm',
     name: '蜂群飞弹',
     nameEn: 'Swarm Missiles',
-    desc: '自动锁定追踪弹，最多同时在空并分散锁定最近目标',
+    desc: '自动锁定追踪弹，最多 6 枚同时在空并分散锁定最近目标',
     color: '#ffe066',
     element: 'fire',
     tier: 3,
@@ -134,7 +134,81 @@ export const WEAPONS = [
   },
 ];
 
-export const WEAPON_BY_ID = Object.fromEntries(WEAPONS.map((w) => [w.id, w]));
+/**
+ * Evolved (legendary) weapons. These definitions were missing entirely, so
+ * evolving any weapon built a WeaponInstance with `def === undefined` and
+ * the game threw every frame afterwards. Evolved weapons are finished
+ * weapons (maxLevel 1, no further upgrades) with stats above the base
+ * weapon's max level; they fire through the base weapon's pattern via
+ * `baseId`. They are deliberately NOT in WEAPONS, so they never appear as
+ * "new weapon" cards or shop stock — evolution is the only way to get one.
+ */
+export const EVOLVED_WEAPONS = [
+  {
+    id: 'scatter_evolved', baseId: 'scatter', name: '爆裂霰弹枪', nameEn: 'Burst Scatter',
+    desc: '传说霰弹：10 发弹丸锥形散射，近距离毁灭性爆发',
+    color: '#ffb13b', element: 'kinetic', tier: 4, sound: 'shotgun', maxLevel: 1,
+    base: { pellets: 10, spread: 0.5, damage: 30, cd: 0.7, speed: 34, life: 0.42, range: 12, knock: 5, size: 0.34 },
+    levels: [],
+  },
+  {
+    id: 'smg_evolved', baseId: 'smg', name: '脉冲加特林', nameEn: 'Pulse Gatling',
+    desc: '传说机枪：双管齐射，射速与伤害全面超越原型',
+    color: '#41b8ff', element: 'kinetic', tier: 4, sound: 'smg', maxLevel: 1,
+    base: { damage: 10, cd: 0.08, speed: 52, life: 0.85, range: 20, knock: 0.7, size: 0.2, jitter: 0.1, pierce: 1, multi: 2 },
+    levels: [],
+  },
+  {
+    id: 'tesla_evolved', baseId: 'tesla', name: '风暴电网', nameEn: 'Storm Grid',
+    desc: '传说线圈：8 次弹跳，麻痹时间更长',
+    color: '#a97bff', element: 'arc', tier: 4, sound: 'tesla', maxLevel: 1,
+    base: { damage: 32, cd: 0.5, speed: 40, life: 0.7, range: 16, bounces: 8, decay: 0.92, stun: 0.45, size: 0.4 },
+    levels: [],
+  },
+  {
+    id: 'grenade_evolved', baseId: 'grenade', name: '集束爆轰', nameEn: 'Cluster Barrage',
+    desc: '传说榴弹：一次齐射 3 枚，爆炸半径更大',
+    color: '#ff7a3b', element: 'fire', tier: 4, sound: 'grenade', maxLevel: 1,
+    base: { damage: 55, cd: 1.1, speed: 18, life: 1.5, radius: 5.5, fuse: 0.45, arc: 7, knock: 6, size: 0.44, count: 3 },
+    levels: [],
+  },
+  {
+    id: 'frost_evolved', baseId: 'frost', name: '绝对零域', nameEn: 'Absolute Zero',
+    desc: '传说喷枪：更宽的冰霜锥，减速更强',
+    color: '#6fe3ff', element: 'frost', tier: 4, sound: 'frost', maxLevel: 1,
+    base: {
+      damage: 7, cd: 0.075, dps: true, cone: 0.65, range: 13,
+      slow: 0.55, slowDur: 1.6, spread: 0.5,
+      fx: { puffs: 3, motes: 1, trail: 0.35, decal: 0.16 },
+    },
+    levels: [],
+  },
+  {
+    id: 'orbital_evolved', baseId: 'orbital', name: '卫星阵列', nameEn: 'Satellite Array',
+    desc: '传说轨道：5 颗轨道体环绕，转速更快',
+    color: '#7dffb0', element: 'kinetic', tier: 4, sound: 'smg', maxLevel: 1,
+    base: { count: 5, damage: 22, radius: 4.2, spin: 3.8, cd: 0.45, knock: 6, size: 0.4 },
+    levels: [],
+  },
+  {
+    id: 'railgun_evolved', baseId: 'railgun', name: '歼星重锤', nameEn: 'Planetfall Hammer',
+    desc: '传说重炮：贯穿光矛伤害更高，冷却更短',
+    color: '#ff5f6d', element: 'arc', tier: 4, sound: 'railgun', maxLevel: 1,
+    base: { damage: 170, cd: 1.4, charge: 0.85, speed: 130, life: 0.9, range: 40, pierce: 99, radius: 4.2, knock: 12, size: 0.5 },
+    levels: [],
+  },
+  {
+    id: 'swarm_evolved', baseId: 'swarm', name: '饱和打击', nameEn: 'Saturation Strike',
+    desc: '传说飞弹：一次齐射 5 枚，最多 10 枚同时在空',
+    color: '#ffe066', element: 'fire', tier: 4, sound: 'swarm', maxLevel: 1,
+    base: { damage: 46, cd: 0.75, count: 5, maxAir: 10, speed: 15, accel: 42, turn: 5.2, life: 3.2, radius: 2.0, knock: 4, size: 0.36 },
+    levels: [],
+  },
+];
+
+export const WEAPON_BY_ID = Object.fromEntries(
+  [...WEAPONS, ...EVOLVED_WEAPONS].map((w) => [w.id, w]),
+);
 
 /** Resolve a weapon's stats at a given level. */
 export function weaponStats(weapon, level) {

@@ -2,11 +2,38 @@ import { RARITY, WAVES } from '../game/config.js';
 import { STATE } from '../game/game.js';
 import { CHARACTERS } from '../game/characters.js';
 import { DIFFICULTIES } from '../game/config.js';
+import { WEAPON_BY_ID } from '../game/weaponDefs.js';
+import { bossForWave } from '../game/enemyDefs.js';
 
 const fmtTime = (s) => {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return `${m}:${String(sec).padStart(2, '0')}`;
+};
+
+// Character stat labels for the select screen.
+const STAT_LABELS = {
+  moveSpeed: '移速', attackSpeed: '攻速', area: '范围', damage: '伤害',
+  pickupRange: '拾取范围', critChance: '暴击率', maxHp: '最大生命', dodge: '闪避',
+};
+
+function statLine(stats) {
+  return Object.entries(stats ?? {})
+    .map(([k, v]) => {
+      const label = STAT_LABELS[k] ?? k;
+      if (k === 'maxHp') return `${label} +${v}`;
+      const pct = Math.round(v * 100);
+      return `${label} ${pct >= 0 ? '+' : ''}${pct}%`;
+    })
+    .join('，');
+}
+
+// Difficulty modifiers, matching DIFFICULTIES in config.js.
+const DIFF_DESC = {
+  easy: '敌人生命 -22%，伤害 -30%，数量 -18%，金币 +15%',
+  normal: '默认数值',
+  hard: '敌人生命 +35%，伤害 +30%，数量 +25%，金币不变',
+  nightmare: '敌人生命 +80%，伤害 +70%，数量 +50%，金币 -10%',
 };
 
 /**
@@ -31,10 +58,10 @@ export class UI {
       <div class="hud" data-hud>
         <div class="hud-top">
           <div class="panel stat-block">
-            <div class="bar hp"><i style="width:100%"></i><span class="bar-label">100 / 100</span></div>
+            <div class="bar hp"><i style="width:100%"></i><span class="bar-label">120 / 120</span></div>
             <div class="row" style="margin-top:8px">
               <span class="tag lv">Lv 1</span>
-              <span class="tag" data-xptext>XP 0/10</span>
+              <span class="tag" data-xptext>XP 0/8</span>
             </div>
             <div class="bar xp" style="margin-top:6px"><i style="width:0%"></i></div>
           </div>
@@ -61,7 +88,7 @@ export class UI {
 
         <div></div>
 
-        <div style="display:flex;align-items:flex-end;gap:12px">
+        <div class="hud-bottom" style="display:flex;align-items:flex-end;gap:12px">
           <div class="panel stat-block" style="min-width:170px">
             <div class="row"><span>击杀</span><b data-kills style="margin-left:auto">0</b></div>
             <div class="row"><span>金币</span><b data-gold style="margin-left:auto;color:var(--amber)">0</b></div>
@@ -71,6 +98,15 @@ export class UI {
         </div>
 
         <div class="panel weapon-bar" data-weapons></div>
+
+        <div class="touch-ui" data-touchui>
+          <div class="joy-zone" data-joyzone><div class="joy-base"><div class="joy-knob" data-joyknob></div></div></div>
+          <div class="touch-btns">
+            <button class="touch-btn" data-touchdash>冲刺</button>
+            <button class="touch-btn ability" data-touchability>技能</button>
+            <button class="touch-btn ghost" data-touchpause>暂停</button>
+          </div>
+        </div>
 
         <div class="panel boss-hud" data-boss>
           <div class="boss-name" data-bossname>BOSS</div>
@@ -86,7 +122,7 @@ export class UI {
       <div class="overlay" data-ov="menu">
         <div class="overlay-inner">
           <h1 class="title">NEON SURVIVORS</h1>
-          <div class="subtitle">霓虹幸存者 · 3D 类幸存者 Roguelite</div>
+          <div class="subtitle">霓虹幸存者 — 3D 类幸存者 Roguelite</div>
           <p style="max-width:640px;color:#a9bcd8;line-height:1.8;font-size:13.5px">
             你被困在霓虹竞技场中。武器自动开火，你只需要走位、抉择与成长。<br/>
             撑过 <b>${WAVES.total}</b> 波并击败虚空吞噬者。
@@ -96,12 +132,13 @@ export class UI {
             <button class="btn ghost" data-act="help">操作说明</button>
           </div>
           <div class="help-grid">
-            <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动</div>
-            <div><kbd>Shift</kbd> 冲刺（短暂无敌）</div>
-            <div><kbd>E</kbd> 释放角色技能</div>
-            <div><kbd>Space</kbd> 暂停</div>
-            <div><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 快速选择升级卡</div>
-            <div><kbd>R</kbd> 升级卡刷新</div>
+            <div class="kbd-help"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动</div>
+            <div class="kbd-help"><kbd>Shift</kbd> 冲刺（短暂无敌）</div>
+            <div class="kbd-help"><kbd>E</kbd> 释放角色技能</div>
+            <div class="kbd-help"><kbd>Space</kbd> 暂停</div>
+            <div class="kbd-help"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 快速选择升级卡</div>
+            <div class="kbd-help"><kbd>R</kbd> 升级卡刷新</div>
+            <div class="touch-help">左侧摇杆移动，右侧按钮冲刺、放技能或暂停，点选卡片与商品</div>
           </div>
           <div class="sect-title">画质</div>
           <div class="diff-row" data-quality>
@@ -109,6 +146,7 @@ export class UI {
             <div class="diff-chip" data-q="med">中</div>
             <div class="diff-chip sel" data-q="high">高</div>
           </div>
+          <div class="muted-note">低画质关闭阴影、减少粒子、降低分辨率，帧率更稳；高画质效果最全。</div>
         </div>
       </div>
 
@@ -119,6 +157,7 @@ export class UI {
           <div class="char-grid" data-chars></div>
           <div class="sect-title">难度</div>
           <div class="diff-row" data-diffs></div>
+          <div class="diff-desc" data-diffdesc></div>
           <div class="btn-row" style="margin-top:24px">
             <button class="btn primary" data-act="start">进入竞技场</button>
             <button class="btn ghost" data-act="back">返回</button>
@@ -134,6 +173,7 @@ export class UI {
           <div class="btn-row">
             <button class="btn ghost" data-act="reroll">刷新（<span data-rerolls>0</span>）</button>
           </div>
+          <div class="reroll-hint" data-rerollhint style="display:none">没有刷新次数？在波次间商店购买「重随」。</div>
         </div>
       </div>
 
@@ -215,6 +255,8 @@ export class UI {
       resultSub: q('[data-resultsub]'),
       build: q('[data-build]'),
       rerolls: q('[data-rerolls]'),
+      rerollHint: q('[data-rerollhint]'),
+      diffDesc: q('[data-diffdesc]'),
       overlays: Object.fromEntries(
         [...this.root.querySelectorAll('[data-ov]')].map((e) => [e.dataset.ov, e]),
       ),
@@ -224,6 +266,11 @@ export class UI {
     this._renderChars();
     this._renderDiffs();
     this._bind();
+    this._bindTouch();
+    // The game may boot at a quality from the ?q= URL param; sync the chips.
+    this.el.quality
+      .querySelectorAll('[data-q]')
+      .forEach((n) => n.classList.toggle('sel', n.dataset.q === this.game.quality));
     // Game already boots in MENU, and _setState() no-ops on an unchanged state,
     // so the overlay has to be shown explicitly here or the title screen renders
     // an empty canvas.
@@ -237,6 +284,8 @@ export class UI {
         <h3>${c.name}</h3>
         <div class="en">${c.nameEn}</div>
         <div class="blurb">${c.blurb}</div>
+        <div class="char-stats">${statLine(c.stats)}</div>
+        <div class="char-weapon">初始武器：${WEAPON_BY_ID[c.weapon]?.name ?? ''}</div>
         <div class="tags">
           <span class="tag">主动：${c.ability.name}</span>
           <span class="tag">难度 ${'★'.repeat(c.difficulty)}</span>
@@ -267,6 +316,7 @@ export class UI {
         this.game.audio.ui();
       });
     });
+    this.el.diffDesc.textContent = DIFF_DESC[this.selectedDiff] ?? '';
   }
 
   _bind() {
@@ -294,6 +344,73 @@ export class UI {
     });
   }
 
+  // Virtual joystick + action buttons for touch devices. The game was
+  // keyboard-only, so on a phone the character could not move at all. The
+  // controls are only displayed on coarse pointers (see style.css).
+  _bindTouch() {
+    const input = this.game.input;
+    const joy = this.root.querySelector('[data-joyzone]');
+    const knob = this.root.querySelector('[data-joyknob]');
+    const R = 44; // px of knob travel; maps to full analog speed
+    let joyId = null;
+    let cx = 0;
+    let cy = 0;
+    const setKnob = (dx, dy) => {
+      knob.style.transform = `translate(${dx}px, ${dy}px)`;
+    };
+    const moveJoy = (e) => {
+      if (e.pointerId !== joyId) return;
+      let dx = e.clientX - cx;
+      let dy = e.clientY - cy;
+      const len = Math.hypot(dx, dy);
+      if (len > R) {
+        dx = (dx / len) * R;
+        dy = (dy / len) * R;
+      }
+      setKnob(dx, dy);
+      input.touchMove.x = dx / R;
+      input.touchMove.y = -dy / R;
+    };
+    const endJoy = (e) => {
+      if (e.pointerId !== joyId) return;
+      joyId = null;
+      setKnob(0, 0);
+      input.touchMove.x = 0;
+      input.touchMove.y = 0;
+    };
+    joy.addEventListener('pointerdown', (e) => {
+      if (joyId !== null) return;
+      joyId = e.pointerId;
+      const r = joy.getBoundingClientRect();
+      cx = r.left + r.width / 2;
+      cy = r.top + r.height / 2;
+      joy.setPointerCapture(e.pointerId);
+      moveJoy(e);
+    });
+    joy.addEventListener('pointermove', moveJoy);
+    joy.addEventListener('pointerup', endJoy);
+    joy.addEventListener('pointercancel', endJoy);
+
+    const dashBtn = this.root.querySelector('[data-touchdash]');
+    dashBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      input.touchDash = true;
+    });
+    const dashOff = () => {
+      input.touchDash = false;
+    };
+    dashBtn.addEventListener('pointerup', dashOff);
+    dashBtn.addEventListener('pointercancel', dashOff);
+    dashBtn.addEventListener('pointerleave', dashOff);
+
+    this.root.querySelector('[data-touchability]').addEventListener('click', () => {
+      if (this.game.player?.useAbility()) this.game.abilityUsed++;
+    });
+    this.root.querySelector('[data-touchpause]').addEventListener('click', () => {
+      this.game.pause();
+    });
+  }
+
   _action(act) {
     const g = this.game;
     g.audio.init();
@@ -302,9 +419,19 @@ export class UI {
         g.audio.ui();
         this.show('character');
         break;
-      case 'help':
+      case 'help': {
+        // The help grid already lives on the menu; scroll it into view and
+        // flash it instead of pointlessly re-showing the same screen.
         this.show('menu');
+        const grid = this.root.querySelector('.help-grid');
+        grid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (grid) {
+          grid.classList.remove('flash');
+          void grid.offsetWidth;
+          grid.classList.add('flash');
+        }
         break;
+      }
       case 'back':
         this.show('menu');
         break;
@@ -316,6 +443,7 @@ export class UI {
         g.resume();
         break;
       case 'quit':
+        if (!window.confirm('放弃本局？本局将直接结算。')) break;
         g.onGameOver(g.buildRunSummary());
         g._setState(STATE.DEAD);
         break;
@@ -376,8 +504,16 @@ export class UI {
       default:
         break;
     }
-    if (state === STATE.PLAYING && g.wave > 0 && g.phase === 'prep') {
-      this.banner(g.phase === 'prep' ? `WAVE ${g.wave}` : '', g.char?.name ?? '');
+    // The HUD character/ability panels were never updated after boot, so
+    // they always showed Vanguard / 过载冲锋 no matter who you picked.
+    if (g.char) this._syncCharHud(g);
+    if (state === STATE.MENU || state === STATE.DEAD || state === STATE.VICTORY) {
+      this._bannerWave = 0;
+    }
+    if (state === STATE.PLAYING && g.wave > 0 && g.phase === 'prep' && this._bannerWave !== g.wave) {
+      this._bannerWave = g.wave;
+      const boss = bossForWave(g.wave);
+      this.banner(`WAVE ${g.wave}`, boss ? `BOSS 战：${boss.name}` : '');
     }
   }
 
@@ -387,6 +523,16 @@ export class UI {
     this.el.banner.classList.remove('show');
     void this.el.banner.offsetWidth;
     this.el.banner.classList.add('show');
+  }
+
+  _syncCharHud(g) {
+    const c = g.char;
+    this.el.charName.textContent = c.name;
+    this.el.charSub.textContent = c.nameEn;
+    this.el.charDot.style.color = c.color;
+    this.el.charDot.style.background = c.color;
+    this.el.abName.textContent = c.ability.name;
+    this.el.abDesc.textContent = c.ability.desc;
   }
 
   showCards(cards, g) {
@@ -409,6 +555,7 @@ export class UI {
       el.addEventListener('click', () => g.chooseCard(i));
     });
     this.el.rerolls.textContent = String(g.player?.rerolls ?? 0);
+    this.el.rerollHint.style.display = (g.player?.rerolls ?? 0) > 0 ? 'none' : 'block';
     this.hideAll();
     this.show('levelup');
   }
@@ -455,7 +602,7 @@ export class UI {
     wrap.classList.toggle('death', !victory);
     this.el.resultTitle.textContent = victory ? '胜利' : '本局结束';
     this.el.resultSub.textContent = victory
-      ? '虚空吞噬者已被击碎 · 竞技场归于寂静'
+      ? '虚空吞噬者已被击碎，竞技场归于寂静'
       : `${sum.character.name} 倒在了 WAVE ${sum.wave}`;
     this.el.results.innerHTML = `
       <div class="result-cell"><div class="v">${sum.wave}</div><div class="k">波次</div></div>
@@ -476,6 +623,13 @@ export class UI {
   update(g) {
     const p = g.player;
     if (!p) return;
+    // Wave banner, once per wave. Later waves start without a state change,
+    // so onState() only ever fired for wave 1; poll here instead.
+    if (g.state === 'playing' && g.phase === 'prep' && g.wave > 0 && g.wave !== this._bannerWave) {
+      this._bannerWave = g.wave;
+      const boss = bossForWave(g.wave);
+      this.banner(`WAVE ${g.wave}`, boss ? `BOSS 战：${boss.name}` : '');
+    }
     this.el.hp.style.width = `${Math.max(0, (p.hp / p.maxHp) * 100)}%`;
     this.el.hpLabel.textContent = `${Math.ceil(p.hp)} / ${Math.round(p.maxHp)}`;
     this.el.xp.style.width = `${Math.min(100, (p.xp / p.xpNeed) * 100)}%`;
@@ -494,7 +648,7 @@ export class UI {
         const w = p.weapons[i];
         if (!w) return `<div class="wslot empty"></div>`;
         return `<div class="wslot" style="color:${w.def.color}" title="${w.def.name} Lv${w.level}">
-          <div class="glyph">⚔</div><div class="lv">${w.level}</div><div class="cd" data-cd></div></div>`;
+          <div class="glyph">${w.def.name.slice(0, 1)}</div><div class="lv">${w.level}</div><div class="cd" data-cd></div></div>`;
       }).join('');
     }
     this.el.weapons.querySelectorAll('.wslot').forEach((slot, i) => {

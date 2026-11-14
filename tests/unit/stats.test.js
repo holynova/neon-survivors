@@ -21,7 +21,7 @@ test('flat and percent modifiers stack', () => {
   const t = new StatBlock();
   t.add({ key: 'maxHp', value: 22, mode: 'flat' });
   t.add({ key: 'maxHp', value: 28, mode: 'flat' });
-  assert.equal(t.get('maxHp'), 150);
+  assert.equal(t.get('maxHp'), BASE_STATS.maxHp + 50);
 });
 
 test('cooldown is clamped so it cannot invert', () => {

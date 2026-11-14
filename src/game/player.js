@@ -241,10 +241,13 @@ export class Player {
     this.radius = PLAYER.radius;
 
     this.stats = new StatBlock();
-    this.stats.add({ key: 'moveSpeed', value: character.stats.moveSpeed ?? 0, mode: 'pct' });
-    this.stats.add({ key: 'attackSpeed', value: character.stats.attackSpeed ?? 0, mode: 'pct' });
-    this.stats.add({ key: 'area', value: character.stats.area ?? 0, mode: 'pct' });
-    this.stats.add({ key: 'damage', value: character.stats.damage ?? 0, mode: 'pct' });
+    // Apply every character stat bonus. Previously only 4 of the 8 keys were
+    // copied, so Vanguard's pickup/crit, Engineer's pickup, Demolitionist's
+    // +15 max HP and Cryomancer's dodge silently did nothing. maxHp is a
+    // flat bonus; every other character stat is a percentage modifier.
+    for (const [key, value] of Object.entries(character.stats ?? {})) {
+      this.stats.add({ key, value, mode: key === 'maxHp' ? 'flat' : 'pct' });
+    }
 
     this.maxHp = this.stats.get('maxHp');
     this.hp = this.maxHp;
@@ -327,7 +330,10 @@ export class Player {
   }
 
   get abilityCooldown() {
-    return 9 * this.stats.get('cooldown');
+    // The cooldown stat is a speed multiplier (>1 = faster): weapon cooldowns
+    // divide by it, so the ability must too. Multiplying made the
+    // "快速冷却" card (+9%) SLOW the ability down to 9.8s instead of 8.3s.
+    return 9 / this.stats.get('cooldown');
   }
 
   get abilityReady() {

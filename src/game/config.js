@@ -11,8 +11,10 @@ export const ARENA = {
 };
 
 export const PLAYER = {
+  // NOTE: starting HP lives here (120); stats.js reads it so the two cannot
+  // drift apart again (BASE_STATS used to say 100, contradicting this file
+  // and the balance test's ">= 5 hits to die" guard).
   maxHp: 120,
-  speed: 7.4,
   radius: 0.62,
   iframes: 0.65,
   dash: { speedMul: 2.25, dur: 0.26, cd: 2.0 },

@@ -168,7 +168,7 @@ export const CHARACTERS = [
     color: '#6fe3ff',
     shape: 'cryo',
     difficulty: 3,
-    blurb: '命中使敌人减速 45%，自身留下冰霜轨迹。主动：范围冻结。',
+    blurb: '命中使敌人减速 40%，自身留下冰霜轨迹。主动：范围冻结。',
     stats: { area: 0.18, moveSpeed: 0.1, dodge: 0.04 },
     rules: { frostTrail: true },
     ability: {

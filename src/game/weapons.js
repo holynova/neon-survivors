@@ -76,7 +76,7 @@ export class WeaponInstance {
     const e = this.def.evolve;
     for (const [k, n] of Object.entries(e.recipes)) recipes[k] -= n;
     const next = new WeaponInstance(e.id, this.player);
-    next.level = this.level;
+    // Evolved weapons are finished (maxLevel 1): level stays 1.
     this.player.removeWeapon(this.def.id);
     this.player.addWeapon(next);
     return next;
@@ -90,24 +90,30 @@ export function updateWeapons(world, dt) {
   const p = world.player;
   if (!p.alive) return;
   for (const w of p.weapons) {
+    // Evolved weapons fire through their base weapon's pattern.
+    const wid = w.def.baseId ?? w.def.id;
     w.cd -= dt;
-    if (w.def.id === 'orbital') {
+    if (wid === 'orbital') {
       w.orbitAngle += w.stats.spin * dt;
       w.orbitalTick -= dt;
       if (w.orbitalTick <= 0) {
-        w.orbitalTick =
-          w.stats.cd / (world.player.stats.get('attackSpeed') * world.player.stats.get('cooldown'));
+        // stats.cd already divides by attackSpeed * cooldown; dividing again
+        // squared the attack-speed bonus.
+        w.orbitalTick = w.stats.cd;
         world.orbitalStrike(w);
       }
       continue;
     }
-    if (w.def.id === 'railgun') {
+    if (wid === 'railgun') {
       // charge-up before firing
       if (w.charge > 0) {
         w.charge -= dt;
         if (w.charge <= 0) {
           world.railgunFire(w);
-          w.charge = w.stats.charge;
+          // Wait out the cooldown before charging again. Re-arming the charge
+          // here made the railgun fire every 0.85s forever, ignoring its
+          // 2.2s cooldown entirely.
+          w.charge = 0;
         }
       } else if (w.cd <= 0) {
         w.charge = w.stats.charge;
@@ -121,7 +127,7 @@ export function updateWeapons(world, dt) {
       const s = w.stats;
       w.cd = s.cd;
       w.shotsFired++;
-      if (w.def.id === 'smg') w.heat = Math.min(1, w.heat + 0.09);
+      if (wid === 'smg') w.heat = Math.min(1, w.heat + 0.09);
     }
     w.heat = Math.max(0, w.heat - dt * 0.35);
     w.recoil = Math.max(0, w.recoil - dt * 8);
@@ -133,7 +139,7 @@ function fireWeapon(world, w) {
   const s = w.stats;
   const aim = world.aimVector();
   const muzzle = world.muzzlePosition(w);
-  switch (w.def.id) {
+  switch (w.def.baseId ?? w.def.id) {
     case 'scatter': {
       const n = s.pellets;
       for (let i = 0; i < n; i++) {
@@ -196,7 +202,9 @@ function fireWeapon(world, w) {
         speed: s.speed,
         damage: s.damage,
         life: s.range / s.speed,
-        bounces: s.bounces,
+        // Arcwelder's +2 bounces (and the 连锁过载 card) live in
+        // player.rules.extraBounces; they were never read before.
+        bounces: s.bounces + (p.rules.extraBounces ?? 0),
         decay: s.decay,
         stun: s.stun,
         radius: s.size,

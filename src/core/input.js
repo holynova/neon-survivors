@@ -9,6 +9,10 @@ export class Input {
     this.keys = new Set();
     this.moveX = 0;
     this.moveY = 0;
+    // Touch controls (virtual joystick + dash button) write here; axis() and
+    // dashing merge them with the keyboard so touch and keys share one path.
+    this.touchMove = { x: 0, y: 0 };
+    this.touchDash = false;
     this.pressed = new Set();
     this.pointer = { x: 0, y: 0, nx: 0, ny: 0, down: false, clicked: false };
     this.enabled = true;
@@ -85,6 +89,12 @@ export class Input {
     if (this.isDown('KeyD') || this.isDown('ArrowRight')) x += 1;
     if (this.isDown('KeyW') || this.isDown('ArrowUp')) y += 1;
     if (this.isDown('KeyS') || this.isDown('ArrowDown')) y -= 1;
+    // Touch joystick overrides the keyboard while deflected (analog magnitude
+    // preserved: a half push moves at half speed).
+    if (Math.hypot(this.touchMove.x, this.touchMove.y) > 0.12) {
+      x = this.touchMove.x;
+      y = this.touchMove.y;
+    }
     const len = Math.hypot(x, y);
     if (len > 1) {
       x /= len;
@@ -96,7 +106,7 @@ export class Input {
   }
 
   get dashing() {
-    return this.isDown('ShiftLeft') || this.isDown('ShiftRight');
+    return this.isDown('ShiftLeft') || this.isDown('ShiftRight') || this.touchDash;
   }
 
   get paused() {

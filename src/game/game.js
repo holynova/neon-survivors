@@ -177,6 +177,7 @@ export class Game {
     if (!QUALITY.particles[q]) return;
     this.quality = q;
     this.postfx.setQuality(q);
+    this.fx.setQuality(q);
     this.renderer.shadowMap.enabled = QUALITY.shadows[q] !== false;
     this.sun.castShadow = QUALITY.shadows[q] !== false;
     const pr = Math.min(window.devicePixelRatio || 1, QUALITY.pixelRatio[q]);
