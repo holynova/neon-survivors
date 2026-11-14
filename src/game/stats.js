@@ -1,7 +1,8 @@
 /** Player stat model: base + additive/multiplicative modifiers, derived values. */
+import { PLAYER } from './config.js';
 
 export const BASE_STATS = {
-  maxHp: 100,
+  maxHp: PLAYER.maxHp,
   hpRegen: 0,
   moveSpeed: 7.4,
   damage: 1.0,        // global multiplier

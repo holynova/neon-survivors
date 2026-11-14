@@ -17,7 +17,12 @@ function card({ id, title, desc, rarity = 'common', icon = '◆', apply, weight 
 }
 
 const PASSIVES = [
-  ['max_hp', '体质强化', '最大生命 +22', (p) => p.stats.add({ key: 'maxHp', value: 22, mode: 'flat' })],
+  ['max_hp', '体质强化', '最大生命 +22', (p) => {
+    p.stats.add({ key: 'maxHp', value: 22, mode: 'flat' });
+    // p.maxHp is cached at construction; without this sync the card changed
+    // the stat but never the actual health pool (the shop armor item syncs).
+    p.maxHp = p.stats.get('maxHp');
+  }],
   ['move_speed', '神经加速', '移动速度 +9%', (p) => p.stats.add({ key: 'moveSpeed', value: 0.09, mode: 'pct' })],
   ['damage', '弹药改良', '全局伤害 +11%', (p) => p.stats.add({ key: 'damage', value: 0.11, mode: 'pct' })],
   ['attack_speed', '快速扳机', '攻击速度 +10%', (p) => p.stats.add({ key: 'attackSpeed', value: 0.1, mode: 'pct' })],
@@ -28,7 +33,7 @@ const PASSIVES = [
   ['armor', '复合装甲', '受伤减免 +3', (p) => p.stats.add({ key: 'armor', value: 3, mode: 'flat' })],
   ['regen', '纳米修复', '每秒恢复 +0.7 生命', (p) => p.stats.add({ key: 'hpRegen', value: 0.7, mode: 'flat' })],
   ['projectile_speed', '高压弹头', '弹速 +18%', (p) => p.stats.add({ key: 'projectileSpeed', value: 0.18, mode: 'pct' })],
-  ['luck', '战利品嗅觉', '幸运 +15%（影响掉落与卡牌稀有度）', (p) => p.stats.add({ key: 'luck', value: 0.15, mode: 'pct' })],
+  ['luck', '战利品嗅觉', '幸运 +15%（提升高稀有度卡牌出现率）', (p) => p.stats.add({ key: 'luck', value: 0.15, mode: 'pct' })],
   ['xp_gain', '经验增幅', '经验获取 +14%', (p) => p.stats.add({ key: 'xpGain', value: 0.14, mode: 'pct' })],
   ['gold_gain', '贪婪', '金币获取 +18%', (p) => p.stats.add({ key: 'goldGain', value: 0.18, mode: 'pct' })],
   ['lifesteal', '吸血符文', '造成伤害的 1.2% 转化为治疗', (p) => p.stats.add({ key: 'lifesteal', value: 0.012, mode: 'flat' })],
@@ -60,7 +65,7 @@ export function buildCardPool(player, wave) {
       card({
         id: `new_${w.id}`,
         title: w.name,
-        desc: `${w.desc}\n【稀有度 ${w.tier}】${w.maxLevel} 级上限`,
+        desc: `${w.desc}\n可升级至 ${w.maxLevel} 级`,
         rarity: w.tier >= 3 ? 'epic' : w.tier === 2 ? 'rare' : 'common',
         icon: '⚔',
         weight: 70,
@@ -79,14 +84,14 @@ export function buildCardPool(player, wave) {
           id: `wpn_${inst.def.id}_${inst.level}`,
           title: `${inst.def.name} Lv${inst.level + 1}`,
           desc: inst.def.id === 'scatter'
-            ? `弹丸 ${preview.pellets} 发 · 伤害 ${Math.round(preview.damage)}`
+            ? `弹丸 ${preview.pellets} 发，伤害 ${Math.round(preview.damage)}`
             : inst.def.id === 'grenade'
-              ? `伤害 ${Math.round(preview.damage)} · 爆炸半径 ${preview.radius?.toFixed(1)}`
+              ? `伤害 ${Math.round(preview.damage)}，爆炸半径 ${preview.radius?.toFixed(1)}`
               : inst.def.id === 'tesla'
-                ? `伤害 ${Math.round(preview.damage)} · 弹跳 ${preview.bounces} 次`
+                ? `伤害 ${Math.round(preview.damage)}，弹跳 ${preview.bounces} 次`
                 : inst.def.id === 'orbital'
-                  ? `轨道体 ${preview.count} 颗 · 伤害 ${Math.round(preview.damage)}`
-                  : `伤害 ${Math.round(preview.damage ?? 0)} · 冷却 ${(preview.cd ?? 0).toFixed(2)}s`,
+                  ? `轨道体 ${preview.count} 颗，伤害 ${Math.round(preview.damage)}`
+                  : `伤害 ${Math.round(preview.damage ?? 0)}，冷却 ${(preview.cd ?? 0).toFixed(2)}s`,
           rarity: inst.level >= 3 ? 'epic' : inst.level === 2 ? 'rare' : 'common',
           icon: '⬆',
           weight: 110,
@@ -104,7 +109,7 @@ export function buildCardPool(player, wave) {
         card({
           id: `evo_${inst.def.id}`,
           title: `进化：${inst.def.evolve.name}`,
-          desc: `将 ${inst.def.name} 进化为传说武器\n伤害与机制全面强化`,
+          desc: `将 ${inst.def.name} 进化为传说武器\n属性大幅强化`,
           rarity: 'legendary',
           icon: '★',
           weight: 46,
@@ -177,7 +182,7 @@ export function buildCardPool(player, wave) {
     card({
       id: `gold_${nextId()}`,
       title: '战利品',
-      desc: '获得 60 金币',
+      desc: '获得 60 金币（按金币获取加成结算）',
       rarity: 'common',
       icon: '◉',
       weight: 30,

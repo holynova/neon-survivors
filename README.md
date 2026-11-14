@@ -7,7 +7,7 @@
   <a href="https://threejs.org/"><img src="https://img.shields.io/badge/Three.js-r186.1-38bdf8?style=flat-square&logo=three.js&logoColor=white" alt="Three.js"></a>
   <a href="https://vite.dev/"><img src="https://img.shields.io/badge/Vite-8.3-646cff?style=flat-square&logo=vite&logoColor=white" alt="Vite"></a>
   <img src="https://img.shields.io/badge/External_Assets-0_KB-10b981?style=flat-square" alt="Zero External Assets">
-  <img src="https://img.shields.io/badge/Tests-113_Unit_%7C_17_E2E-a855f7?style=flat-square" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-131_Unit_%7C_17_E2E-a855f7?style=flat-square" alt="Tests">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square" alt="License MIT"></a>
 </p>
 
@@ -155,7 +155,7 @@ npm run preview
 项目拥有极为严苛的测试守卫，确保数值平衡与运行时稳定：
 
 ```bash
-# 运行全部测试 (113 单元测试 + 17 Playwright E2E)
+# 运行全部测试 (131 单元测试 + 17 Playwright E2E)
 npm test
 
 # 仅运行单元测试 (~1 秒内完成)

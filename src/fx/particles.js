@@ -234,7 +234,9 @@ export class ParticleSystem {
  */
 export class FX {
   constructor(scene, quality = 'high') {
-    const budget = QUALITY.particles[quality] ?? QUALITY.particles.high;
+    // Allocate buffers at the high budget so setQuality() can raise the live
+    // cap later without reallocating; the live cap is applied below.
+    const budget = QUALITY.particles.high;
     const split = (f) => Math.max(256, Math.floor(budget * f));
     this.quality = quality;
     this.spark = new ParticleSystem(scene, { max: split(0.3), shape: 1, name: 'fx-spark' });
@@ -254,6 +256,23 @@ export class FX {
     this.ring = new ParticleSystem(scene, { max: split(0.06), shape: 2, name: 'fx-ring' });
     this.trail = new ParticleSystem(scene, { max: split(0.08), shape: 1, name: 'fx-trail' });
     this.all = [this.spark, this.glow, this.smoke, this.shard, this.ring, this.trail];
+    this.setQuality(quality);
+  }
+
+  /**
+   * Live particle-budget cap (same split as the constructor). Previously the
+   * menu quality switch never touched the particle systems, so picking 低画质
+   * left all 24000 particles live. Lowering the cap only stops new emits;
+   * in-flight particles drain naturally.
+   */
+  setQuality(quality) {
+    const budget = QUALITY.particles[quality] ?? QUALITY.particles.high;
+    const split = (f) => Math.max(256, Math.floor(budget * f));
+    const fractions = [0.3, 0.16, 0.2, 0.2, 0.06, 0.08];
+    this.quality = quality;
+    this.all.forEach((p, i) => {
+      p.max = split(fractions[i]);
+    });
   }
 
   setPixelRatio(r) {
