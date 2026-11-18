@@ -1,24 +1,24 @@
+<p align="right"><a href="README.en.md">English</a></p>
+
 <p align="center">
   <img src="./assets/readme/hero.svg" width="100%" alt="NEON SURVIVORS — 霓虹幸存者：俯视角霓虹竞技场网格，中央青色玩家菱形向四周发射弹丸，粉色敌怪从边缘逼近">
 </p>
 
 <p align="center">
-  <a href="https://xiaosang.cc/neon-survivors/">▶ 在线玩 Play Online</a>
+  <a href="https://xiaosang.cc/neon-survivors/">▶ 在线玩</a>
   ·
   <a href="https://github.com/holynova/neon-survivors">GitHub 仓库</a>
 </p>
 
 霓虹幸存者（Neon Survivors）是一款浏览器里的 3D 俯视角类幸存者 Roguelite 竞技场：选一个角色，在霓虹竞技场中撑过 20 波敌潮，拾取晶核升级、三选一构筑，波间进商店补强，最终击败泰坦 Boss 通关。零外部资源——模型全部 Three.js 程序化生成，音效由 WebAudio 实时合成，仓库里没有任何模型、贴图或音频文件。Three.js + Vite。
 
-Neon Survivors is a 3D top-down survivors-like roguelite that runs in the browser: pick a character, survive 20 waves in a neon arena, level up with XP gems, build your loadout with pick-1-of-3 upgrades, gear up in the between-wave shop, and take down Titan bosses to clear the run. Zero external assets — every model is procedurally generated with Three.js and every sound is synthesized live with WebAudio. Three.js + Vite.
-
-## 截图 / Screenshots
+## 截图
 
 <p align="center">
   <img src="./assets/readme/screenshot-game.jpg" width="720" alt="实战画面：第 7 波，猎人持霰弹枪在霓虹网格竞技场中迎战敌群，左上角血条与经验，右上角波次计时">
 </p>
 
-## 玩法 / How to Play
+## 玩法
 
 - **移动**：WASD / 方向键；武器全自动瞄准，优先索敌射程内最近或威胁度最高的目标。
 - **冲刺**：Shift 战术冲刺，短暂爆发位移突破包围（冷却 2 秒）。
@@ -26,7 +26,7 @@ Neon Survivors is a 3D top-down survivors-like roguelite that runs in the browse
 - **暂停**：Space / Esc 暂停，随时查看面板与武器数值。
 - **升级选卡**：拾取晶核涨经验，升级时三选一（数字键 1/2/3 或鼠标点击）。
 
-## 角色 / Characters
+## 角色
 
 5 个角色各有专属规则改写与主动技能：
 
@@ -38,7 +38,7 @@ Neon Survivors is a 3D top-down survivors-like roguelite that runs in the browse
 | 电刑者 Arcwelder | 特斯拉线圈 | 闪电弹跳 +2，命中附带麻痹硬直 | 电网过载：全场敌人感电 2.5 秒，持续伤害并麻痹 |
 | 霜蚀者 Cryomancer | 霜冻喷枪 | 攻击使敌人减速（基础减速 40%），移动留下冰霜足迹 | 绝对零度：半径 12 范围冻结敌人 3 秒 |
 
-## 武器与进化 / Weapons & Evolution
+## 武器与进化
 
 8 种武器，满级（Lv.4）搭配核心材料可进化为超武：
 
@@ -55,7 +55,7 @@ Neon Survivors is a 3D top-down survivors-like roguelite that runs in the browse
 
 最多同时持有 6 把武器。升级卡含基础属性、元素特化（燃烧 / 极寒 / 电容 / 动能）与角色专属稀有卡。
 
-## 波次与 Boss / Waves & Bosses
+## 波次与 Boss
 
 共 20 波（普通波 55 秒，Boss 波 70 秒），每 5 波迎来泰坦 Boss 战：
 
@@ -70,7 +70,7 @@ Neon Survivors is a 3D top-down survivors-like roguelite that runs in the browse
 
 波间商店：买新武器槽位、定向升级武器、纳米维修包回血、刷新货架。
 
-## 技术 / Tech
+## 技术
 
 - Three.js（唯一运行时依赖）+ Vite，ESM 架构；模型程序化生成，Fresnel 轮廓 Shader 让纯色几何体在弹幕中保持锐利剪影。
 - 扫掠碰撞（Swept AABB/Circle）防高速弹丸穿透；固定步长主循环驱动 `timeScale`，暴击与重型爆炸触发顿帧与慢镜。
@@ -90,7 +90,7 @@ tests/unit/             9 个测试文件（数值、碰撞、轨迹、平衡、
 tests/e2e/              Playwright 端到端（启动 → 选角 → 战斗 → 商店 → 结算）
 ```
 
-## 本地运行与测试 / Run Locally & Test
+## 本地运行与测试
 
 ```bash
 npm install
@@ -105,17 +105,6 @@ npm run test:unit   # 116 个用例（本地实跑 116 通过）
 npm run test:e2e    # 17 个 Playwright 用例
 ```
 
-## English
-
-**Neon Survivors** is a 3D top-down survivors-like roguelite in the browser: pick a character, survive 20 waves in a neon arena, level up with XP gems, draft pick-1-of-3 upgrades, shop between waves, and beat Titan bosses to clear the run. Zero external assets — all models are procedurally generated with Three.js, all sound is synthesized live with WebAudio.
-
-- **Controls**: WASD/arrows to move (weapons auto-aim); Shift to dash (2s cooldown); E for your character's ultimate; Space/Esc to pause; 1/2/3 or click to pick upgrades.
-- **5 characters**, each with a rule-changing trait and an ultimate: Vanguard (shotgun, bonus coin drops), Engineer (SMG, kill-streak drones), Demolitionist (grenade launcher, +35% blast radius), Arcwelder (Tesla coil, chain lightning + stun), Cryomancer (frost lance, 40% base slow).
-- **8 weapons**, each evolving at max level with a core material: Scatter, Pulse SMG, Tesla, Grenade, Frost Lance, Orbital Guard, Railgun, Swarm Missiles. Up to 6 weapons at once.
-- **20 waves** (55s normal, 70s boss), Titan bosses every 5 waves: Colossus (5), Hierophant (10), Devourer (15, and again as the wave-20 finale). 9 enemy types, 4 difficulties (Casual/Standard/Hard/Nightmare).
-- **Tech**: Three.js (only runtime dependency) + Vite. Fresnel outline shader, swept AABB/circle collision, fixed-timestep loop with hitstop/slow-mo, GPU particle systems (Bloom, chromatic aberration, shockwave rings, lightning arcs). All tuning lives in `src/game/config.js`.
-- **Run & test**: `npm install && npm run dev` (http://localhost:5180). `npm test` runs 116 unit tests (verified passing locally) + 17 Playwright E2E cases.
-
-## 许可 / License
+## 许可
 
 MIT，见 `LICENSE`。
